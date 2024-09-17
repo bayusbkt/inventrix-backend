@@ -2,17 +2,18 @@ import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
 import session from "express-session";
-import sequelizeStore from "connect-session-sequelize"
+import sequelizeStore from "connect-session-sequelize";
 import { connection, sequelize } from "./Config/Database.js";
+import router from "./Routes/Api.js";
 
 dotenv.config();
 const PORT = process.env.port;
 const app = express();
 
-const sessionStore = sequelizeStore(session.Store)
+const sessionStore = sequelizeStore(session.Store);
 const store = new sessionStore({
-  db: sequelize
-})
+  db: sequelize,
+});
 
 app.use(express.json());
 
@@ -24,17 +25,19 @@ app.use(
 );
 
 app.use(
-    session({
-      secret: process.env.SESSION_SECRET,
-      resave: false,
-      saveUninitialized: true,
-      store: store,
-      cookie: {
-        secure: "auto",
-        maxAge: 1000 * 60 * 15
-      },
-    })
-  );
+  session({
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: true,
+    store: store,
+    cookie: {
+      secure: "auto",
+      maxAge: 1000 * 60 * 15,
+    },
+  })
+);
+
+app.use(router);
 
 connection();
 app.listen(PORT, () => {
