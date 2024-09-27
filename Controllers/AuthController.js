@@ -2,13 +2,14 @@ import UserModel from "../Models/UserModel.js";
 import bcrypt from "bcrypt";
 
 class AuthControllers {
+
   async login(req, res) {
     try {
-      const { name, password } = req.body;
-      if (!name) throw { message: "Please Input Name" };
+      const { nis, password } = req.body;
+      if (!nis) throw { message: "Please Input NIS" };
       if (!password) throw { message: "Please Input Password" };
 
-      const user = await UserModel.findOne({ where: { name } });
+      const user = await UserModel.findOne({ where: { nis } });
       if (!user) throw { message: "User Not Found" };
 
       const matchedPassword = await bcrypt.compare(password, user.password);
@@ -19,8 +20,8 @@ class AuthControllers {
 
       const userInfo = {
         id: user.id,
+        nis: user.nis,
         name: user.name,
-        email: user.email,
         role: user.role,
       };
 
@@ -66,7 +67,6 @@ class AuthControllers {
       });
     }
   }
-
 }
 
 export default new AuthControllers();

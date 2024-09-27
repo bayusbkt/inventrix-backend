@@ -1,5 +1,6 @@
 import { DataTypes } from "sequelize";
 import { sequelize } from "../Config/Database.js";
+import ItemModel from "./ItemModel.js";
 
 const UserModel = sequelize.define("User", {
   id: {
@@ -10,6 +11,13 @@ const UserModel = sequelize.define("User", {
     validate: {
       notEmpty: true,
     },
+  },
+  nis: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    validate: {
+      notEmpty: true
+    }
   },
   name: {
     type: DataTypes.STRING,

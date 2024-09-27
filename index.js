@@ -5,6 +5,7 @@ import session from "express-session";
 import sequelizeStore from "connect-session-sequelize";
 import { connection, sequelize } from "./Config/Database.js";
 import router from "./Routes/Api.js";
+import setupAssociations from "./Models/SetupAssociations.js";
 
 dotenv.config();
 const PORT = process.env.port;
@@ -39,6 +40,7 @@ app.use(
 
 app.use(router);
 
+setupAssociations();
 connection();
 app.listen(PORT, () => {
   console.log("Server up and running...");

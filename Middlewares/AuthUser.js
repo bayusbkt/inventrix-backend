@@ -26,10 +26,10 @@ class AuthUser {
 
   async adminOnly(req, res, next) {
     try {
-      if (user.role !== "Admin") throw { message: "Access denied" };
+      if (req.role !== "Admin") throw { message: "Access denied" };
       next();
     } catch (error) {
-      res.status(400).json({
+      res.status(403).json({
         status: false,
         message: error.message,
       });
