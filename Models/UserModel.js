@@ -27,14 +27,6 @@ const UserModel = sequelize.define("User", {
       len: [3, 100],
     },
   },
-  email: {
-    type: DataTypes.STRING,
-    allowNull: false,
-    validate: {
-      notEmpty: true,
-      isEmail: true,
-    },
-  },
   password: {
     type: DataTypes.STRING,
     allowNull: false,
