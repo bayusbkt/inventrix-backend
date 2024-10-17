@@ -3,8 +3,7 @@ import UserModel from "../Models/UserModel.js";
 class AuthUser {
   async verifyUser(req, res, next) {
     try {
-      if (!req.session.userId)
-        throw { message: "Mohon Login terlebih dahulu" };
+      if (!req.session.userId) throw { message: "Mohon Login terlebih dahulu" };
 
       const user = await UserModel.findOne({
         where: {
