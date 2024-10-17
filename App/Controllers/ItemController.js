@@ -43,6 +43,7 @@ class ItemController {
         itemName,
         description,
         quantity,
+        inQuantity: quantity,
         itemStatus: "Tersedia",
       });
       if (!item) throw { message: "Gagal membuat Item" };
@@ -89,7 +90,7 @@ class ItemController {
       }
 
       if (itemStatus) {
-        if (!["Tersedia", "Dipinjam", "Dalam Perbaikan"].includes(itemStatus)) {
+        if (!["Tersedia", "Dipinjam", "Dalam Perbaikan", "Rusak"].includes(itemStatus)) {
           throw { message: "Invalid Item Status" };
         }
 
@@ -116,7 +117,7 @@ class ItemController {
       const { id } = req.params;
 
       const item = await ItemModel.destroy({ where: { id } });
-      if (!item) throw { message: "Item tidak ditemukaN" };
+      if (!item) throw { message: "Item tidak ditemukan" };
 
       return res.status(200).json({
         status: true,

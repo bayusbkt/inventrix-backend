@@ -30,24 +30,23 @@ const ItemModel = sequelize.define("Item", {
       min: 1
     },
   },
+  outQuantity: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+    defaultValue: 0
+  },
+  inQuantity: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+    defaultValue: 0
+  },
   itemStatus: {
-    type: DataTypes.ENUM("Tersedia", "Dipinjam", "Dalam Perbaikan"),
+    type: DataTypes.ENUM("Tersedia", "Dipinjam", "Dalam Perbaikan", "Rusak"),
     allowNull: false,
     defaultValue: 'Tersedia',
     validate: {
-        isIn: [['Tersedia', 'Dipinjam', 'Dalam Perbaikan']],
+        isIn: [['Tersedia', 'Dipinjam', 'Dalam Perbaikan', 'Rusak']],
       },
-  },
-  checkoutTime: {
-    type: DataTypes.DATE,
-    allowNull: true,
-    validate: {
-      notEmpty: true,
-    },
-  },
-  returnTime: {
-    type: DataTypes.DATE,
-    allowNull: true
   },
   userId: {
     type: DataTypes.UUID,

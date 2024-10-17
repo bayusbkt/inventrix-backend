@@ -17,13 +17,15 @@ router.post("/change-password", AuthUser.verifyUser, UserController.changePasswo
 
 //Item
 router.post("/create-item", AuthUser.verifyUser, AuthUser.adminOnly, ItemController.createItem); //Admin Only
-router.put("/update-item", AuthUser.verifyUser, AuthUser.adminOnly, ItemController.updateItem); //Admin Only
-router.delete("/delete-item", AuthUser.verifyUser, AuthUser.adminOnly, ItemController.deleteItem); //Admin Only
+router.put("/update-item/:id", AuthUser.verifyUser, AuthUser.adminOnly, ItemController.updateItem); //Admin Only
+router.delete("/delete-item/:id", AuthUser.verifyUser, AuthUser.adminOnly, ItemController.deleteItem); //Admin Only
 router.get("/item/:id?", AuthUser.verifyUser, ItemController.getItem);
 
 //Checkout (Pinjam)
 router.post("/checkout/:itemId", AuthUser.verifyUser, CheckoutController.checkoutItem);
 router.post("/return/:itemId", AuthUser.verifyUser, CheckoutController.returnItem);
-router.get("/checkouted-items", AuthUser.verifyUser, CheckoutController.getCheckoutedItem);
+router.get("/checkouted-items", AuthUser.verifyUser, CheckoutController.checkoutedItem);
+// router.get("/checkout-history", AuthUser.verifyUser, CheckoutController.checkoutHistory);
+// router.get("/return-history", AuthUser.verifyUser, CheckoutController.returnHistory);
 
 export default router;

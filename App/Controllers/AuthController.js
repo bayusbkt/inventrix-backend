@@ -2,7 +2,6 @@ import UserModel from "../Models/UserModel.js";
 import bcrypt from "bcrypt";
 
 class AuthControllers {
-
   async login(req, res) {
     try {
       const { nis, password } = req.body;

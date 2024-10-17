@@ -1,6 +1,8 @@
 import ItemModel from "../Models/ItemModel.js";
 import UserModel from "../Models/UserModel.js";
+import TransactionModel from "../Models/TransactionModel.js";
 import { sequelize } from "../Config/Database.js";
+import { Op } from "sequelize";
 
 class CheckoutController {
   async checkoutItem(req, res) {
@@ -11,27 +13,36 @@ class CheckoutController {
 
       const user = await UserModel.findByPk(req.userId, { transaction: t });
       if (!user) {
-        await t.rollback();
         throw { message: "Pengguna tidak ditemukan" };
       }
 
       const item = await ItemModel.findByPk(itemId, { transaction: t });
       if (!item) {
-        await t.rollback();
         throw { message: "Item Not Found" };
       }
 
       if (item.itemStatus !== "Tersedia") {
-        await t.rollback();
         throw { message: "Item tidak tersedia" };
       }
 
       await item.update(
         {
-          itemStatus: req.body.itemStatus,
-          userId: user.userId,
+          itemStatus: "Dipinjam",
+          userId: user.dataValues.id,
+          outQuantity: item.outQuantity + 1,
+          inQuantity: item.inQuantity - 1,
           checkoutTime: new Date(),
           returnTime: null,
+        },
+        { transaction: t }
+      );
+
+      await TransactionModel.create(
+        {
+          itemId: item.id,
+          userId: user.dataValues.id,
+          transactionType: "Peminjaman",
+          transactionDate: new Date(),
         },
         { transaction: t }
       );
@@ -44,14 +55,13 @@ class CheckoutController {
         data: {
           itemId: item.itemId,
           itemName: item.itemName,
-          userId: user.userId,
+          userId: user.dataValues.id,
           userName: user.name,
           checkoutTime: item.checkoutTime,
         },
       });
     } catch (error) {
       await t.rollback();
-      console.error("Error saat meminjam item:", error);
       res.status(400).json({
         status: false,
         message: error.message,
@@ -65,22 +75,37 @@ class CheckoutController {
       const { itemId } = req.params;
       if (!itemId) throw { message: "Item ID dibutuhkan" };
 
+      const user = await UserModel.findByPk(req.userId, { transaction: t });
+      if (!user) {
+        throw { message: "Pengguna tidak ditemukan" };
+      }
+
       const item = await ItemModel.findByPk(itemId, { transaction: t });
       if (!item) {
-        await t.rollback();
         throw { message: "Item tidak ditemukan" };
       }
 
       if (item.itemStatus !== "Dipinjam") {
-        await t.rollback();
         throw { message: "Item tidak sedang dipinjam" };
       }
 
       await item.update(
         {
-          itemStatus: req.body.itemStatus,
+          itemStatus: "Tersedia",
+          outQuantity: item.outQuantity - 1,
+          inQuantity: item.inQuantity + 1,
           userId: null,
           returnTime: new Date(),
+        },
+        { transaction: t }
+      );
+
+      await TransactionModel.create(
+        {
+          itemId: item.id,
+          userId: user.dataValues.id,
+          transactionType: "Pengembalian",
+          transactionDate: new Date(),
         },
         { transaction: t }
       );
@@ -98,7 +123,6 @@ class CheckoutController {
       });
     } catch (error) {
       await t.rollback();
-      console.error("Error saat mengembalikan item:", error);
       res.status(400).json({
         status: false,
         message: error.message,
@@ -106,7 +130,7 @@ class CheckoutController {
     }
   }
 
-  async getCheckoutedItem(req, res) {
+  async checkoutedItem(req, res) {
     try {
       const checkoutItem = await ItemModel.findAll({
         where: {
