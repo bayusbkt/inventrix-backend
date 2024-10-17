@@ -1,6 +1,5 @@
 import { DataTypes } from "sequelize";
 import { sequelize } from "../Config/Database.js";
-import UserModel from "./UserModel.js";
 
 const ItemModel = sequelize.define("Item", {
   id: {
@@ -32,11 +31,11 @@ const ItemModel = sequelize.define("Item", {
     },
   },
   itemStatus: {
-    type: DataTypes.ENUM("Available", "CheckedOut", "Maintenance"),
+    type: DataTypes.ENUM("Tersedia", "Dipinjam", "Dalam Perbaikan"),
     allowNull: false,
-    defaultValue: 'Available',
+    defaultValue: 'Tersedia',
     validate: {
-        isIn: [['Available', 'CheckedOut', 'Maintenance']],
+        isIn: [['Tersedia', 'Dipinjam', 'Dalam Perbaikan']],
       },
   },
   checkoutTime: {

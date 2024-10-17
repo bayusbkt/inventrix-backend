@@ -6,14 +6,14 @@ class AuthControllers {
   async login(req, res) {
     try {
       const { nis, password } = req.body;
-      if (!nis) throw { message: "Please Input NIS" };
-      if (!password) throw { message: "Please Input Password" };
+      if (!nis) throw { message: "Mohon masukkan NIS" };
+      if (!password) throw { message: "Mohon masukkan Password" };
 
       const user = await UserModel.findOne({ where: { nis } });
-      if (!user) throw { message: "User Not Found" };
+      if (!user) throw { message: "Pengguna tidak ditemukan" };
 
       const matchedPassword = await bcrypt.compare(password, user.password);
-      if (!matchedPassword) throw { message: "Password Incorrect" };
+      if (!matchedPassword) throw { message: "Password salah" };
 
       //Memasukkan ID dari user ke SESSION
       req.session.userId = user.id;
@@ -27,7 +27,7 @@ class AuthControllers {
 
       return res.status(200).json({
         status: true,
-        message: "Login Succesful",
+        message: "Login Berhasil",
         data: userInfo,
       });
     } catch (error) {
@@ -43,7 +43,7 @@ class AuthControllers {
       if (!req.session.userId) {
         return res.status(400).json({
           status: false,
-          message: "No active session, please login first!",
+          message: "Tidak ada Session aktif, mohon Login ulang!",
         });
       }
 
@@ -51,14 +51,14 @@ class AuthControllers {
         if (error)
           res.status(400).json({
             status: false,
-            message: "Logout failed",
+            message: "Logout Gagal",
           });
       });
 
       res.clearCookie("connect.sid");
       return res.status(200).json({
         status: true,
-        message: "Logout succesful",
+        message: "Logout Berhasil",
       });
     } catch (error) {
       res.status(400).json({

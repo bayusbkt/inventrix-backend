@@ -7,12 +7,12 @@ class CheckoutController {
     const t = await sequelize.transaction();
     try {
       const { itemId } = req.params;
-      if (!itemId) throw { message: "Item ID is Required" };
+      if (!itemId) throw { message: "Item ID dibutuhkan" };
 
       const user = await UserModel.findByPk(req.userId, { transaction: t });
       if (!user) {
         await t.rollback();
-        throw { message: "User Not Found" };
+        throw { message: "Pengguna tidak ditemukan" };
       }
 
       const item = await ItemModel.findByPk(itemId, { transaction: t });
@@ -21,14 +21,14 @@ class CheckoutController {
         throw { message: "Item Not Found" };
       }
 
-      if (item.itemStatus !== "Available") {
+      if (item.itemStatus !== "Tersedia") {
         await t.rollback();
-        throw { message: "Item is Not Available" };
+        throw { message: "Item tidak tersedia" };
       }
 
       await item.update(
         {
-          itemStatus: "CheckedOut",
+          itemStatus: req.body.itemStatus,
           userId: user.userId,
           checkoutTime: new Date(),
           returnTime: null,
@@ -40,7 +40,7 @@ class CheckoutController {
 
       return res.status(200).json({
         status: true,
-        message: "Success Checkout Item",
+        message: "Sukses meminjam item",
         data: {
           itemId: item.itemId,
           itemName: item.itemName,
@@ -51,7 +51,7 @@ class CheckoutController {
       });
     } catch (error) {
       await t.rollback();
-      console.error("Error during checkout:", error);
+      console.error("Error saat meminjam item:", error);
       res.status(400).json({
         status: false,
         message: error.message,
@@ -63,22 +63,22 @@ class CheckoutController {
     const t = await sequelize.transaction();
     try {
       const { itemId } = req.params;
-      if (!itemId) throw { message: "Item ID is Required" };
+      if (!itemId) throw { message: "Item ID dibutuhkan" };
 
       const item = await ItemModel.findByPk(itemId, { transaction: t });
       if (!item) {
         await t.rollback();
-        throw { message: "Item Not Found" };
+        throw { message: "Item tidak ditemukan" };
       }
 
-      if (item.itemStatus !== "CheckedOut") {
+      if (item.itemStatus !== "Dipinjam") {
         await t.rollback();
-        throw { message: "Item is Not CheckedOut" };
+        throw { message: "Item tidak sedang dipinjam" };
       }
 
       await item.update(
         {
-          itemStatus: "Available",
+          itemStatus: req.body.itemStatus,
           userId: null,
           returnTime: new Date(),
         },
@@ -89,7 +89,7 @@ class CheckoutController {
 
       return res.status(200).json({
         status: true,
-        message: "Success Return Item",
+        message: "Sukses mengembalikan item",
         data: {
           itemId: item.id,
           itemName: item.name,
@@ -98,7 +98,7 @@ class CheckoutController {
       });
     } catch (error) {
       await t.rollback();
-      console.error("Error during checkout:", error);
+      console.error("Error saat mengembalikan item:", error);
       res.status(400).json({
         status: false,
         message: error.message,
@@ -110,7 +110,7 @@ class CheckoutController {
     try {
       const checkoutItem = await ItemModel.findAll({
         where: {
-          itemStatus: "CheckedOut",
+          itemStatus: "Dipinjam",
         },
         include: [
           {
@@ -123,7 +123,7 @@ class CheckoutController {
 
       return res.status(200).json({
         status: true,
-        message: "Success Get Checkouted Item",
+        message: "Sukses melihat item yang dipinjam",
         data: checkoutItem,
       });
     } catch (error) {

@@ -4,14 +4,14 @@ class AuthUser {
   async verifyUser(req, res, next) {
     try {
       if (!req.session.userId)
-        throw { message: "Please login to your account" };
+        throw { message: "Mohon Login terlebih dahulu" };
 
       const user = await UserModel.findOne({
         where: {
           id: req.session.userId,
         },
       });
-      if (!user) throw { message: "User not found" };
+      if (!user) throw { message: "Pengguna tidak ditemukan" };
 
       req.userId = user.id;
       req.role = user.role;
@@ -26,7 +26,7 @@ class AuthUser {
 
   async adminOnly(req, res, next) {
     try {
-      if (req.role !== "Admin") throw { message: "Access denied" };
+      if (req.role !== "Admin") throw { message: "Akses ditolak" };
       next();
     } catch (error) {
       res.status(403).json({

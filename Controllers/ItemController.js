@@ -6,20 +6,20 @@ class ItemController {
       const { id } = req.params;
       if (id) {
         const item = await ItemModel.findByPk(id);
-        if (!item) throw { message: "Item Not Found" };
+        if (!item) throw { message: "Item tidak ditemukan" };
 
         return res.status(200).json({
           status: true,
-          message: "Success Get Item",
+          message: "Sukses melihat item",
           data: item,
         });
       } else {
         const item = await ItemModel.findAll();
-        if (!item) throw { message: "Item Not Found" };
+        if (!item) throw { message: "Item tidak ditemukan" };
 
         return res.status(200).json({
           status: true,
-          message: "Success Get All Item",
+          message: "Sukses melihat semua item",
           data: item,
         });
       }
@@ -34,22 +34,22 @@ class ItemController {
   async createItem(req, res) {
     try {
       const { itemName, description, quantity } = req.body;
-      if (!itemName) throw { message: "Please Input Item Name" };
-      if (!quantity) throw { message: "Please Input Quantity" };
+      if (!itemName) throw { message: "Mohon masukkan nama Item" };
+      if (!quantity) throw { message: "Mohon masukkan jumlah Item" };
       if (quantity <= 0)
-        throw { message: "Item Must Have at Least 1 Quantity" };
+        throw { message: "Setidaknya harus memiliki 1 Item" };
 
       const item = await ItemModel.create({
         itemName,
         description,
         quantity,
-        itemStatus: "Available",
+        itemStatus: "Tersedia",
       });
-      if (!item) throw { message: "Failed to Create Item" };
+      if (!item) throw { message: "Gagal membuat Item" };
 
       return res.status(201).json({
         status: true,
-        message: "Success Create Item",
+        message: "Sukses membuat Item",
         data: item,
       });
     } catch (error) {
@@ -65,13 +65,13 @@ class ItemController {
       const { id } = req.params;
       const { itemName, description, quantity, itemStatus } = req.body;
 
-      if (!itemName) throw { message: "Please Input Item Name" };
-      if (!quantity) throw { message: "Please Input Quantity" };
+      if (!itemName) throw { message: "Mohon masukkan nama Item" };
+      if (!quantity) throw { message: "Mohon masukkan jumlah Item" };
       if (quantity <= 0)
-        throw { message: "Item Must Have at Least 1 Quantity" };
+        throw { message: "Setidaknya harus memiliki 1 Item" };
 
       const item = await ItemModel.findByPk(id);
-      if (!item) throw { message: "Item Not Found" };
+      if (!item) throw { message: "Item tidak ditemukan" };
 
       if (itemName) {
         item.itemName = itemName;
@@ -83,13 +83,13 @@ class ItemController {
 
       if (quantity) {
         if (quantity <= 0)
-          throw { message: "Item Must Have at Least 1 Quantity" };
+          throw { message: "Setidaknya harus memiliki 1 Item" };
 
         item.quantity = quantity;
       }
 
       if (itemStatus) {
-        if (!["Available", "CheckedOut", "Maintenance"].includes(itemStatus)) {
+        if (!["Tersedia", "Dipinjam", "Dalam Perbaikan"].includes(itemStatus)) {
           throw { message: "Invalid Item Status" };
         }
 
@@ -116,11 +116,11 @@ class ItemController {
       const { id } = req.params;
 
       const item = await ItemModel.destroy({ where: { id } });
-      if (!item) throw { message: "Item Not Found" };
+      if (!item) throw { message: "Item tidak ditemukaN" };
 
       return res.status(200).json({
         status: true,
-        message: "Success Delete Item",
+        message: "Sukses menghapus Item",
       });
     } catch (error) {
       res.status(400).json({
