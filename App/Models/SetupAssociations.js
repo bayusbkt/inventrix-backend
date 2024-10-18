@@ -38,8 +38,6 @@ const setupAssociations = () => {
     foreignKey: "item_id", 
     as: "item" 
   });
-
-  ;
 };
 
 export default setupAssociations;

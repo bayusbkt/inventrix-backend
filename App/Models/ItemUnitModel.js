@@ -39,6 +39,10 @@ const ItemUnitModel = sequelize.define("Unit", {
       isIn: [["Tersedia", "Dipinjam", "Dalam Perbaikan", "Rusak"]],
     },
   },
+  description: {
+    type: DataTypes.TEXT,
+    allowNull: true,
+  },
   outTime: {
     type: DataTypes.DATE,
     allowNull: true,

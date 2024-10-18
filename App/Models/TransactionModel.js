@@ -1,5 +1,8 @@
 import { DataTypes } from "sequelize";
 import { sequelize } from "../Config/Database.js";
+import ItemUnitModel from "./ItemUnitModel.js";
+import UserModel from "./UserModel.js";
+import ItemModel from "./ItemModel.js";
 
 const TransactionModel = sequelize.define("Transaction", {
   id: {
@@ -11,24 +14,32 @@ const TransactionModel = sequelize.define("Transaction", {
       notEmpty: true,
     },
   },
+  item_id: {
+    type: DataTypes.UUID,
+    allowNull: false,
+    references: {
+      model: ItemModel,
+      key: "id",
+    },
+  },
   unit_id: {
     type: DataTypes.UUID,
     allowNull: false,
     references: {
-      model: 'Units',
-      key: 'id',
+      model: ItemUnitModel,
+      key: "id",
     },
   },
   user_id: {
     type: DataTypes.UUID,
     allowNull: false,
     references: {
-      model: 'Users',
-      key: 'id',
+      model: UserModel,
+      key: "id",
     },
   },
   transactionType: {
-    type: DataTypes.ENUM('Peminjaman', 'Pengembalian', 'Perbaikan'),
+    type: DataTypes.ENUM("Peminjaman", "Pengembalian", "Perbaikan", "Lainnya"),
     allowNull: false,
   },
   transactionDate: {

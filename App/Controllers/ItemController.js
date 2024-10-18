@@ -9,8 +9,8 @@ class ItemController {
         const item = await ItemModel.findByPk(id, {
           include: {
             model: ItemUnitModel,
-            as: "units"
-          }
+            as: "units",
+          },
         });
         if (!item) throw { message: "Item tidak ditemukan" };
 
@@ -81,47 +81,27 @@ class ItemController {
   async updateItem(req, res) {
     try {
       const { id } = req.params;
-      const { itemName, description, quantity, itemStatus } = req.body;
+      const { itemName, description } = req.body;
 
       if (!itemName) throw { message: "Mohon masukkan nama Item" };
-      if (!quantity) throw { message: "Mohon masukkan jumlah Item" };
-      if (quantity <= 0) throw { message: "Setidaknya harus memiliki 1 Item" };
+      if (!description) throw { message: "Mohon masukkan deskripsi Item" };
 
       const item = await ItemModel.findByPk(id);
-      if (!item) throw { message: "Item tidak ditemukan" };
 
-      if (itemName) {
-        item.itemName = itemName;
+      if (!item) {
+        return res.status(404).json({
+          status: false,
+          message: "Item tidak ditemukan",
+        });
       }
 
-      if (description) {
-        item.description = description;
-      }
-
-      if (quantity) {
-        if (quantity <= 0)
-          throw { message: "Setidaknya harus memiliki 1 Item" };
-
-        item.quantity = quantity;
-      }
-
-      if (itemStatus) {
-        if (
-          !["Tersedia", "Dipinjam", "Dalam Perbaikan", "Rusak"].includes(
-            itemStatus
-          )
-        ) {
-          throw { message: "Invalid Item Status" };
-        }
-
-        item.itemStatus = itemStatus;
-      }
-
+      item.itemName = itemName;
+      item.description = description;
       await item.save();
 
       return res.status(200).json({
         status: true,
-        message: "Success Update Item",
+        message: "Berhasil Update Item",
         data: item,
       });
     } catch (error) {
@@ -150,6 +130,8 @@ class ItemController {
       });
     }
   }
+
+  
 }
 
 export default new ItemController();
