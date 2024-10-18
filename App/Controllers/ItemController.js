@@ -1,11 +1,17 @@
 import ItemModel from "../Models/ItemModel.js";
+import ItemUnitModel from "../Models/ItemUnitModel.js";
 
 class ItemController {
   async getItem(req, res) {
     try {
       const { id } = req.params;
       if (id) {
-        const item = await ItemModel.findByPk(id);
+        const item = await ItemModel.findByPk(id, {
+          include: {
+            model: ItemUnitModel,
+            as: "units"
+          }
+        });
         if (!item) throw { message: "Item tidak ditemukan" };
 
         return res.status(200).json({
@@ -30,14 +36,13 @@ class ItemController {
       });
     }
   }
-  
+
   async createItem(req, res) {
     try {
       const { itemName, description, quantity } = req.body;
       if (!itemName) throw { message: "Mohon masukkan nama Item" };
       if (!quantity) throw { message: "Mohon masukkan jumlah Item" };
-      if (quantity <= 0)
-        throw { message: "Setidaknya harus memiliki 1 Item" };
+      if (quantity <= 0) throw { message: "Setidaknya harus memiliki 1 Item" };
 
       const item = await ItemModel.create({
         itemName,
@@ -47,6 +52,18 @@ class ItemController {
         itemStatus: "Tersedia",
       });
       if (!item) throw { message: "Gagal membuat Item" };
+
+      const units = [];
+      for (let i = 0; i < quantity; i++) {
+        const unit = await ItemUnitModel.create({
+          item_id: item.id,
+          user_id: null,
+          status: "Tersedia",
+          outTime: null,
+          inTime: null,
+        });
+        units.push(unit);
+      }
 
       return res.status(201).json({
         status: true,
@@ -68,8 +85,7 @@ class ItemController {
 
       if (!itemName) throw { message: "Mohon masukkan nama Item" };
       if (!quantity) throw { message: "Mohon masukkan jumlah Item" };
-      if (quantity <= 0)
-        throw { message: "Setidaknya harus memiliki 1 Item" };
+      if (quantity <= 0) throw { message: "Setidaknya harus memiliki 1 Item" };
 
       const item = await ItemModel.findByPk(id);
       if (!item) throw { message: "Item tidak ditemukan" };
@@ -90,7 +106,11 @@ class ItemController {
       }
 
       if (itemStatus) {
-        if (!["Tersedia", "Dipinjam", "Dalam Perbaikan", "Rusak"].includes(itemStatus)) {
+        if (
+          !["Tersedia", "Dipinjam", "Dalam Perbaikan", "Rusak"].includes(
+            itemStatus
+          )
+        ) {
           throw { message: "Invalid Item Status" };
         }
 

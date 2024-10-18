@@ -11,15 +11,15 @@ const TransactionModel = sequelize.define("Transaction", {
       notEmpty: true,
     },
   },
-  itemId: {
+  unit_id: {
     type: DataTypes.UUID,
     allowNull: false,
     references: {
-      model: 'Items',
+      model: 'Units',
       key: 'id',
     },
   },
-  userId: {
+  user_id: {
     type: DataTypes.UUID,
     allowNull: false,
     references: {
@@ -28,7 +28,7 @@ const TransactionModel = sequelize.define("Transaction", {
     },
   },
   transactionType: {
-    type: DataTypes.ENUM('Peminjaman', 'Pengembalian'),
+    type: DataTypes.ENUM('Peminjaman', 'Pengembalian', 'Perbaikan'),
     allowNull: false,
   },
   transactionDate: {

@@ -157,6 +157,21 @@ class CheckoutController {
       });
     }
   }
+
+  async returnedItem(req, res) {
+    try {
+      const returnItem = await ItemModel.findAll({
+        where: {
+          itemStatus: ""
+        }
+      })
+    } catch (error) {
+      res.status(400).json({
+        status: false,
+        message: error.message,
+      });
+    }
+  }
 }
 
 export default new CheckoutController();

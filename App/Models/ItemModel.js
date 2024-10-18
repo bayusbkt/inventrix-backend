@@ -40,18 +40,6 @@ const ItemModel = sequelize.define("Item", {
     allowNull: true,
     defaultValue: 0
   },
-  itemStatus: {
-    type: DataTypes.ENUM("Tersedia", "Dipinjam", "Dalam Perbaikan", "Rusak"),
-    allowNull: false,
-    defaultValue: 'Tersedia',
-    validate: {
-        isIn: [['Tersedia', 'Dipinjam', 'Dalam Perbaikan', 'Rusak']],
-      },
-  },
-  userId: {
-    type: DataTypes.UUID,
-    allowNull: true,
-  }
 });
 
 export default ItemModel;
