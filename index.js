@@ -4,8 +4,8 @@ import cors from "cors";
 import session from "express-session";
 import sequelizeStore from "connect-session-sequelize";
 import { connection, sequelize } from "./App/Config/Database.js";
-import router from "./App/Routes/Api.js";
 import setupAssociations from "./App/Models/SetupAssociations.js";
+import router from "./App/Routes/Api.js";
 
 dotenv.config();
 const PORT = process.env.port;
