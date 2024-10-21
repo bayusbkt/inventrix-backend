@@ -1,8 +1,11 @@
 import { Sequelize } from "sequelize";
 import dotenv from "dotenv/config";
 
+let dbName;
+process.env.STATUS == "PRODUCTION" ? dbName = process.env.DB_PROD_NAME : dbName = process.env.DB_DEV_NAME
+
 const sequelize = new Sequelize(
-  process.env.DBNAME,
+  dbName,
   process.env.DBUSERNAME,
   process.env.DBPASSWORD,
   {

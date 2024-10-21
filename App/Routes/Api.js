@@ -5,6 +5,7 @@ import UserController from "../Controllers/UserController.js";
 import ItemController from "../Controllers/ItemController.js";
 import ItemUnitController from "../Controllers/ItemUnitController.js";
 import TransactionController from "../Controllers/TransactionController.js";
+import ServiceController from "../Controllers/ServiceController.js";
 
 const router = express.Router();
 
@@ -33,6 +34,9 @@ router.post("/transaction/checkout/:unitId", AuthUser.verifyUser, TransactionCon
 router.post("/transaction/return/:unitId", AuthUser.verifyUser, TransactionController.returnUnit);
 router.post("/transaction/repair/:unitId", AuthUser.verifyUser, TransactionController.repairUnit);
 router.post("/transaction/broken/:unitId", AuthUser.verifyUser, TransactionController.brokenUnit);
+
+//Export to Excel
+router.get("/export/transaction-history", AuthUser.verifyUser, ServiceController.TransactionHistoryExcel);
 
 // router.get("/checkout-history", AuthUser.verifyUser, CheckoutController.checkoutHistory);
 // router.get("/return-history", AuthUser.verifyUser, CheckoutController.returnHistory);

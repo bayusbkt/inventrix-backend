@@ -34,6 +34,11 @@ const setupAssociations = () => {
     as: "unit",
   });
 
+  TransactionModel.belongsTo(ItemModel, {
+    foreignKey: "item_id",
+    as: "item"
+  })
+
   ItemUnitModel.belongsTo(ItemModel, { 
     foreignKey: "item_id", 
     as: "item" 
