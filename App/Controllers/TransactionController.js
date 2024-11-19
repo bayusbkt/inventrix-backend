@@ -16,7 +16,8 @@ class TransactionController {
 
       const unit = await ItemUnitModel.findByPk(unitId, { transaction: t });
       if (!unit) throw { message: "Unit tidak ditemukan" };
-      if (unit.status !== "Tersedia") throw { message: "Unit tidak tersedia untuk dipinjam" }
+      if (unit.status !== "Tersedia")
+        throw { message: "Unit tidak tersedia untuk dipinjam" };
 
       const item = await ItemModel.findByPk(unit.item_id, { transaction: t });
       if (!item) throw { message: "Item tidak ditemukan" };
@@ -52,16 +53,24 @@ class TransactionController {
         { transaction: t }
       );
 
-      await t.commit();
-
-      return res.status(200).json({
-        status: true,
-        message: "Berhasil meminjam unit",
-        data: checkoutData,
-      });
+      const { status } = req.body;
+      if (status === "Dikonfirmasi") {
+        await t.commit(); // Menyimpan transaksi ke database
+        return res.status(200).json({
+          status: true,
+          message: "Checkout berhasil dikonfirmasi",
+          data: checkoutData,
+        });
+      } else {
+        await t.rollback(); // Membatalkan transaksi
+        return res.status(400).json({
+          status: false,
+          message: "Checkout tidak dikonfirmasi",
+        });
+      }
     } catch (error) {
-      await t.rollback();
-      res.status(400).json({
+      await t.rollback(); // Rollback untuk menangani error
+      return res.status(500).json({
         status: false,
         message: error.message,
       });
@@ -79,7 +88,8 @@ class TransactionController {
 
       const unit = await ItemUnitModel.findByPk(unitId, { transaction: t });
       if (!unit) throw { message: "Unit tidak ditemukan" };
-      if (unit.status !== "Dipinjam") throw { message: "Unit tidak sedang dipinjam" }
+      if (unit.status !== "Dipinjam")
+        throw { message: "Unit tidak sedang dipinjam" };
 
       const item = await ItemModel.findByPk(unit.item_id, { transaction: t });
       if (!item) throw { message: "Item tidak ditemukan" };
@@ -241,6 +251,8 @@ class TransactionController {
       });
     }
   }
+
+  async checkoutHistory(req, res) {}
 }
 
 export default new TransactionController();
