@@ -53,7 +53,7 @@ class TransactionController {
         { transaction: t }
       );
 
-      const { status } = req.body;
+      const { status } = req.params;
       if (status === "Dikonfirmasi") {
         await t.commit(); // Menyimpan transaksi ke database
         return res.status(200).json({
