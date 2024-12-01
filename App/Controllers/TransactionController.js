@@ -236,7 +236,13 @@ class TransactionController {
         include: [
           { model: ItemUnitModel, as: "unit" },
           { model: ItemModel, as: "item" },
-          { model: UserModel, as: "user" },
+          {
+            model: UserModel,
+            as: "user",
+            attributes: {
+              exclude: ["password"],
+            },
+          },
         ],
         transaction: t,
       });
@@ -281,19 +287,22 @@ class TransactionController {
         return res.status(200).json({
           status: true,
           message: "Checkout berhasil dikonfirmasi",
-          data: transactionData
+          data: transactionData,
         });
       } else {
-        await transactionData.update({
-          transactionType: "Ditolak",
-          transactionDate: now
-        }, { transaction: t });
-  
+        await transactionData.update(
+          {
+            transactionType: "Ditolak",
+            transactionDate: now,
+          },
+          { transaction: t }
+        );
+
         await t.commit();
         return res.status(200).json({
           status: true,
           message: "Checkout ditolak",
-          data: transactionData
+          data: transactionData,
         });
       }
     } catch (error) {
