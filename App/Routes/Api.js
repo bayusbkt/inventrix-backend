@@ -27,6 +27,7 @@ router.get("/item/:id?", AuthUser.verifyUser, ItemController.getItem);
 router.post("/unit/create/:itemId", AuthUser.verifyUser, AuthUser.adminOnly, ItemUnitController.createUnit); //Admin Only
 router.put("/unit/update/:id", AuthUser.verifyUser, AuthUser.adminOnly, ItemUnitController.updateUnit); //Admin Only
 router.delete("/unit/delete/:id", AuthUser.verifyUser, AuthUser.adminOnly, ItemUnitController.deleteUnit); //Admin Only
+router.get("/unit/:itemId", AuthUser.verifyUser, ItemUnitController.getUnitByItemId);
 router.get("/unit/:id?", AuthUser.verifyUser, ItemUnitController.getUnit);
 
 //Transaction (Pinjam)

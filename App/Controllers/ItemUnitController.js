@@ -33,6 +33,57 @@ class ItemUnitController {
     }
   }
 
+  async getUnitByItemId(req, res) {
+    try {
+      const { itemId } = req.params;
+      if (!itemId) throw { message: "Item ID tidak valid" };
+
+      const item = await ItemModel.findByPk(itemId);
+      if (!item) throw { message: "Item tidak ditemukan" };
+
+      const units = await ItemUnitModel.findAll({
+        where: { item_id: itemId },
+        order: [["status", "ASC"]],
+      });
+
+      if (units.length === 0) {
+        return res.status(200).json({
+          status: true,
+          message: "Tidak ada unit untuk item ini",
+          data: [],
+        });
+      }
+
+      const summary = {
+        total: units.length,
+        tersedia: units.filter((unit) => unit.status === "Tersedia").length,
+        dipinjam: units.filter((unit) => unit.status === "Dipinjam").length,
+        dalamPerbaikan: units.filter(
+          (unit) => unit.status === "Dalam Perbaikan"
+        ).length,
+        rusak: units.filter((unit) => unit.status === "Rusak").length,
+      };
+
+      return res.status(200).json({
+        status: true,
+        message: "Sukses mendapatkan daftar unit",
+        data: {
+          item: {
+            id: item.id,
+            name: item.itemName,
+            description: item.description,
+          },
+          summary,
+          units,
+        },
+      });
+    } catch (error) {
+      res.status(400).json({
+        status: false,
+        message: error.message,
+      });
+    }
+  }
   async createUnit(req, res) {
     try {
       const { itemId } = req.params;
@@ -103,24 +154,24 @@ class ItemUnitController {
     try {
       const { id } = req.params;
       if (!id) throw { message: "ID Invalid" };
-  
+
       const unit = await ItemUnitModel.findByPk(id);
-      if (!unit) throw { message: "Unit tidak ditemukan"};
-  
+      if (!unit) throw { message: "Unit tidak ditemukan" };
+
       if (unit.status !== "Tersedia") {
-        throw { message: "Unit sedang dipinjam atau tidak tersedia"};
+        throw { message: "Unit sedang dipinjam atau tidak tersedia" };
       }
-  
+
       const item = await ItemModel.findByPk(unit.item_id);
-      if (!item) throw { message: "Item tidak ditemukan"};
-  
+      if (!item) throw { message: "Item tidak ditemukan" };
+
       await unit.destroy();
-  
+
       await item.update({
         quantity: item.quantity - 1,
         inQuantity: item.inQuantity - 1,
       });
-  
+
       return res.status(200).json({
         status: true,
         message: "Sukses menghapus unit",
@@ -132,7 +183,6 @@ class ItemUnitController {
       });
     }
   }
-  
 }
 
 export default new ItemUnitController();
