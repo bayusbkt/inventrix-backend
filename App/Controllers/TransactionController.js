@@ -29,21 +29,20 @@ class TransactionController {
           item_id: unit.item_id,
           unit_id: unit.id,
           user_id: user.id,
-          transactionType: "Peminjaman",
+          transactionType: "Menunggu Konfirmasi",
           transactionDate: now,
-          // status: "Menunggu Konfirmasi", ini harusnya bikinin modelnya sendiri gak sih?
         },
         { transaction: t }
       );
 
-      await t.commit(); // Menyimpan transaksi ke database
+      await t.commit();
       return res.status(200).json({
         status: true,
         message: "Checkout berhasil. Silahkan menunggu konfirmasi dari admin",
         data: checkoutData,
       });
     } catch (error) {
-      await t.rollback(); // Rollback untuk menangani error
+      await t.rollback();
       return res.status(400).json({
         status: false,
         message: error.message,
@@ -233,66 +232,72 @@ class TransactionController {
       const { transactionId } = req.params;
       if (!transactionId) throw { message: "Transaction ID dibutuhkan" };
 
-      const unit = await TransactionModel.findByPk(transactionId, {
+      const transactionData = await TransactionModel.findByPk(transactionId, {
+        include: [
+          { model: ItemUnitModel, as: "unit" },
+          { model: ItemModel, as: "item" },
+          { model: UserModel, as: "user" },
+        ],
         transaction: t,
       });
-      if (!unit) throw { message: "Unit tidak ditemukan" };
-      if (unit.status !== "Tersedia")
-        throw { message: "Unit tidak tersedia untuk dipinjam" };
-
-      const item = await TransactionModel.findByPk(unit.item_id, {
-        transaction: t,
-      });
-      if (!item) throw { message: "Item tidak ditemukan" };
-
-      // const transaction = await TransactionModel.findByPk(TransactionModel.id, {
-      //   transaction: t,
-      // });
-      // if (!transaction) throw { message: "Transaksi tidak ditemukan" };
-
-      const checkoutData = await TransactionModel.findOne({
-        where: {
-          id: TransactionModel.id,
-        },
-      });
-
-      if (!checkoutData)
-        throw { message: "Data checkout unit tidak ditemukan" };
+      if (!transactionData) throw { message: "Transaksi tidak ditemukan" };
+      if (transactionData.transactionType !== "Menunggu Konfirmasi")
+        throw { message: "Transaksi tidak dalam status menunggu konfirmasi" };
 
       const { status } = req.body;
-      if (status === "Dikonfirmasi") {
-        await unit.update(
+      const now = new Date();
+
+      if (status == "Dikonfirmasi") {
+        //Update Unit
+        await transactionData.unit.update(
           {
-            user_id: user.id,
             status: "Dipinjam",
+            user_id: transactionData.user_id,
             outTime: now,
             inTime: null,
           },
           { transaction: t }
         );
 
-        await item.update(
+        //Update Item
+        await transactionData.item.update(
           {
-            outQuantity: item.outQuantity + 1,
-            inQuantity: item.inQuantity - 1,
+            outQuantity: transactionData.item.outQuantity + 1,
+            inQuantity: transactionData.item.inQuantity - 1,
           },
           { transaction: t }
         );
 
-        await t.commit(); // Menyimpan transaksi ke database
+        //Update Transaction
+        await transactionData.update(
+          {
+            transactionType: "Peminjaman",
+            transactionDate: now,
+          },
+          { transaction: t }
+        );
+
+        await t.commit();
         return res.status(200).json({
           status: true,
           message: "Checkout berhasil dikonfirmasi",
-          data: checkoutData,
+          data: transactionData
         });
       } else {
-        await t.rollback(); // Membatalkan transaksi
-        return res.status(400).json({
-          status: false,
-          message: "Checkout tidak dikonfirmasi",
+        await transactionData.update({
+          transactionType: "Ditolak",
+          transactionDate: now
+        }, { transaction: t });
+  
+        await t.commit();
+        return res.status(200).json({
+          status: true,
+          message: "Checkout ditolak",
+          data: transactionData
         });
       }
     } catch (error) {
+      await t.rollback();
       res.status(400).json({
         status: false,
         message: error.message,

@@ -39,7 +39,14 @@ const TransactionModel = sequelize.define("Transaction", {
     },
   },
   transactionType: {
-    type: DataTypes.ENUM("Peminjaman", "Pengembalian", "Perbaikan", "Lainnya"),
+    type: DataTypes.ENUM(
+      "Menunggu Konfirmasi",
+      "Ditolak",
+      "Peminjaman",
+      "Pengembalian",
+      "Perbaikan",
+      "Lainnya"
+    ),
     allowNull: false,
   },
   transactionDate: {

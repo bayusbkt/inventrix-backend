@@ -14,37 +14,13 @@ router.post("/login", AuthControllers.login);
 router.delete("/logout", AuthControllers.logout);
 
 //User
-router.post(
-  "/user/create",
-  AuthUser.verifyUser,
-  AuthUser.adminOnly,
-  UserController.createUser
-); //Admin Only
-router.post(
-  "/user/change-password",
-  AuthUser.verifyUser,
-  UserController.changePassword
-);
+router.post("/user/create", AuthUser.verifyUser, AuthUser.adminOnly, UserController.createUser); //Admin Only
+router.post("/user/change-password", AuthUser.verifyUser, UserController.changePassword);
 
 //Item
-router.post(
-  "/item/create",
-  AuthUser.verifyUser,
-  AuthUser.adminOnly,
-  ItemController.createItem
-); //Admin Only
-router.put(
-  "/item/update/:id",
-  AuthUser.verifyUser,
-  AuthUser.adminOnly,
-  ItemController.updateItem
-); //Admin Only
-router.delete(
-  "/item/delete/:id",
-  AuthUser.verifyUser,
-  AuthUser.adminOnly,
-  ItemController.deleteItem
-); //Admin Only
+router.post("/item/create", AuthUser.verifyUser, AuthUser.adminOnly, ItemController.createItem); //Admin Only
+router.put("/item/update/:id", AuthUser.verifyUser, AuthUser.adminOnly, ItemController.updateItem); //Admin Only
+router.delete("/item/delete/:id", AuthUser.verifyUser, AuthUser.adminOnly, ItemController.deleteItem); //Admin Only
 router.get("/item/:id?", AuthUser.verifyUser, ItemController.getItem);
 
 //Unit
@@ -54,41 +30,13 @@ router.delete("/unit/delete/:id", AuthUser.verifyUser, AuthUser.adminOnly, ItemU
 router.get("/unit/:id?", AuthUser.verifyUser, ItemUnitController.getUnit);
 
 //Transaction (Pinjam)
-router.post(
-  "/transaction/checkout/:unitId",
-  AuthUser.verifyUser,
-  TransactionController.checkoutUnit
-);
-router.post(
-  "/transaction/return/:unitId",
-  AuthUser.verifyUser,
-  TransactionController.returnUnit
-);
-router.post(
-  "/transaction/repair/:unitId",
-  AuthUser.verifyUser,
-  TransactionController.repairUnit
-);
-router.post(
-  "/transaction/broken/:unitId",
-  AuthUser.verifyUser,
-  TransactionController.brokenUnit
-);
-router.post(
-  "/transaction/accept-checkout/:transactionId",
-  AuthUser.verifyUser,
-  AuthUser.adminOnly,
-  TransactionController.acceptCheckout
-);
+router.post("/transaction/checkout/:unitId", AuthUser.verifyUser, TransactionController.checkoutUnit);
+router.post("/transaction/return/:unitId", AuthUser.verifyUser, TransactionController.returnUnit);
+router.post("/transaction/repair/:unitId", AuthUser.verifyUser, TransactionController.repairUnit);
+router.post("/transaction/broken/:unitId", AuthUser.verifyUser, TransactionController.brokenUnit);
+router.post("/transaction/accept-checkout/:transactionId", AuthUser.verifyUser, AuthUser.adminOnly, TransactionController.acceptCheckout); //Admin Only
 
 //Export to Excel
-router.get(
-  "/export/transaction-history",
-  AuthUser.verifyUser,
-  ServiceController.TransactionHistoryExcel
-);
-
-// router.get("/checkout-history", AuthUser.verifyUser, CheckoutController.checkoutHistory);
-// router.get("/return-history", AuthUser.verifyUser, CheckoutController.returnHistory);
+router.get("/export/transaction-history", AuthUser.verifyUser, ServiceController.TransactionHistoryExcel);
 
 export default router;
