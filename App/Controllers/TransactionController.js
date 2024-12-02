@@ -317,6 +317,22 @@ class TransactionController {
   async getAllTransaction(req, res) {
     try {
       const transactionData = await TransactionModel.findAll({
+        include: [
+          {
+            model: UserModel,
+            as: "user",
+            attributes: {
+              exclude: ["password"],
+            },
+          },
+          { model: ItemModel, as: "item", attributes: { exclude: ["id"] } },
+          {
+            model: ItemUnitModel,
+            as: "unit",
+            attributes: { exclude: ["id", "item_id", "user_id"] },
+          },
+        ],
+
         order: [["createdAt", "ASC"]],
       });
 
