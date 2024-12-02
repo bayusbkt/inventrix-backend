@@ -6,9 +6,10 @@ import sequelizeStore from "connect-session-sequelize";
 import { connection, sequelize } from "./App/Config/Database.js";
 import setupAssociations from "./App/Models/SetupAssociations.js";
 import router from "./App/Routes/Api.js";
+import cookieParser from "cookie-parser";
 
 dotenv.config();
-const PORT = process.env.port;
+const PORT = process.env.PORT;
 const app = express();
 
 const sessionStore = sequelizeStore(session.Store);
@@ -19,14 +20,21 @@ const store = new sessionStore({
 });
 
 app.use(express.json());
+app.use(cookieParser());
+const corsOptions = {
+  origin: ["http://localhost:3000", "http://localhost:5173"],
+  credentials: true,
+};
 
-app.use(
-  cors({
-    credentials: true,
-    origin: "http://localhost:5173",
-  })
-);
+app.use(cors(corsOptions));
+app.options("*", cors(corsOptions));
 
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Credentials", "true");
+  next();
+});
+
+// Session
 app.use(
   session({
     secret: process.env.SESSION_SECRET,
@@ -35,7 +43,8 @@ app.use(
     store: store,
     rolling: true,
     cookie: {
-      secure: "auto",
+      secure: false,
+      httpOnly: false,
       maxAge: 1000 * 60 * 15,
     },
   })
