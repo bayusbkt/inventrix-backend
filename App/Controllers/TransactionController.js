@@ -313,6 +313,24 @@ class TransactionController {
       });
     }
   }
+
+  async getAllTransaction(req, res) {
+    try {
+      const transactionData = await TransactionModel.findAll({
+        order: [["createdAt", "ASC"]],
+      });
+
+      return res.status(200).json({
+        status: "Success",
+        data: transactionData,
+      });
+    } catch (error) {
+      res.status(500).json({
+        status: false,
+        error: error.message,
+      });
+    }
+  }
 }
 
 export default new TransactionController();
