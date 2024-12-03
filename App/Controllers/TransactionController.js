@@ -318,6 +318,76 @@ class TransactionController {
     }
   }
 
+  async rejectCheckout(req, res) {
+    const t = await sequelize.transaction();
+  
+    try {
+      const { transactionId } = req.params;
+      if (!transactionId) throw { message: "Transaction ID dibutuhkan" };
+  
+      const transactionData = await TransactionModel.findByPk(transactionId, {
+        include: [
+          { model: ItemUnitModel, as: "unit" },
+          { model: ItemModel, as: "item" },
+          {
+            model: UserModel,
+            as: "user",
+            attributes: {
+              exclude: ["password"],
+            },
+          },
+        ],
+        transaction: t,
+      });
+      if (!transactionData) throw { message: "Transaksi tidak ditemukan" };
+      if (transactionData.transactionType !== "Menunggu Konfirmasi")
+        throw { message: "Transaksi tidak dalam status menunggu konfirmasi" };
+  
+      const { status } = req.body;
+      const now = new Date();
+  
+      if (status === "Ditolak") {
+        await transactionData.unit.update(
+          {
+            status: "Tersedia",
+            user_id: null,
+            outTime: null,
+            inTime: null,
+          },
+          { transaction: t }
+        );
+  
+        await transactionData.update(
+          {
+            transactionType: "Ditolak",
+            transactionDate: now,
+          },
+          { transaction: t }
+        );
+  
+        await t.commit();
+        return res.status(200).json({
+          status: true,
+          message: "Checkout berhasil ditolak",
+          data: transactionData,
+        });
+      } else {
+        await t.commit();
+        return res.status(200).json({
+          status: true,
+          message: "Tidak ada perubahan status",
+          data: transactionData,
+        });
+      }
+    } catch (error) {
+      await t.rollback();
+      res.status(400).json({
+        status: false,
+        message: error.message,
+      });
+    }
+  }
+
   async getAllTransaction(req, res) {
     try {
       const transactionData = await TransactionModel.findAll({

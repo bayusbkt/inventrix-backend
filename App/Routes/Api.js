@@ -100,6 +100,12 @@ router.post(
   AuthUser.adminOnly,
   TransactionController.acceptCheckout
 ); //Admin Only
+router.post(
+  "/transaction/reject-checkout/:transactionId",
+  AuthUser.verifyUser,
+  AuthUser.adminOnly,
+  TransactionController.rejectCheckout
+); //Admin Only
 router.get(
   "/transaction/checkout",
   AuthUser.verifyUser,
