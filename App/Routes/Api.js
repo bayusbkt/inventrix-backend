@@ -67,7 +67,11 @@ router.delete(
   ItemUnitController.deleteUnit
 ); //Admin Only
 router.get("/unit/:id?", AuthUser.verifyUser, ItemUnitController.getUnit);
-router.get("/unit-by-itemid/:itemId", AuthUser.verifyUser, ItemUnitController.getUnitByItemId);
+router.get(
+  "/unit-by-itemid/:itemId",
+  AuthUser.verifyUser,
+  ItemUnitController.getUnitByItemId
+);
 
 //Transaction (Pinjam)
 router.post(
@@ -113,6 +117,11 @@ router.get(
   AuthUser.verifyUser,
   AuthUser.adminOnly,
   TransactionController.getMenungguKonfirmasi
+);
+router.get(
+  `/transaction/user-peminjaman/:userId`,
+  AuthUser.verifyUser,
+  TransactionController.getUserPeminjaman
 );
 
 //Export to Excel

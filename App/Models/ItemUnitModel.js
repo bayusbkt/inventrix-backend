@@ -32,11 +32,11 @@ const ItemUnitModel = sequelize.define("Unit", {
     },
   },
   status: {
-    type: DataTypes.ENUM("Tersedia", "Dipinjam", "Dalam Perbaikan", "Rusak"),
+    type: DataTypes.ENUM("Tersedia", "Dipinjam", "Menunggu Konfirmasi", "Dalam Perbaikan", "Rusak"),
     allowNull: false,
     defaultValue: "Tersedia",
     validate: {
-      isIn: [["Tersedia", "Dipinjam", "Dalam Perbaikan", "Rusak"]],
+      isIn: [["Tersedia", "Dipinjam", "Menunggu Konfirmasi", "Dalam Perbaikan", "Rusak"]],
     },
   },
   description: {

@@ -24,6 +24,10 @@ class TransactionController {
 
       const now = new Date();
 
+      await unit.update({
+        status: "Menunggu Konfirmasi"
+      }, {transaction: t})
+
       const checkoutData = await TransactionModel.create(
         {
           item_id: unit.item_id,
@@ -418,6 +422,60 @@ class TransactionController {
       });
     }
   }
+
+  async getUserPeminjaman(req, res) {
+    try {
+      const { userId } = req.params;
+      if (!userId) throw { message: "User ID tidak ditemukan" };
+  
+      const userPeminjaman = await TransactionModel.findAll({
+        where: { 
+          transactionType: "Peminjaman",
+          user_id: userId 
+        },
+        include: [
+          {
+            model: UserModel,
+            as: "user",
+            attributes: {
+              exclude: ["password"],
+            },
+          },
+          { 
+            model: ItemModel,
+            as: "item",
+            attributes: { exclude: ["id"] } 
+          },
+          {
+            model: ItemUnitModel,
+            where: { status: "Dipinjam" },
+            as: "unit",
+            attributes: { exclude: ["id", "item_id", "user_id"] },
+          },
+        ],
+        order: [["createdAt", "ASC"]],
+      });
+  
+      if (userPeminjaman.length === 0) {
+        return res.status(200).json({
+          status: true,
+          message: "Tidak ada peminjaman yang ditemukan untuk pengguna ini",
+          data: []
+        });
+      }
+  
+      return res.status(200).json({
+        status: "Success",
+        data: userPeminjaman,
+      });
+    } catch (error) {
+      res.status(500).json({
+        status: false,
+        error: error.message,
+      });
+    }
+  }
+  
 }
 
 export default new TransactionController();

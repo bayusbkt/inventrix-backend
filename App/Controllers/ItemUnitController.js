@@ -43,7 +43,6 @@ class ItemUnitController {
 
       const units = await ItemUnitModel.findAll({
         where: { item_id: itemId },
-        order: [["status", "ASC"]],
       });
 
       if (units.length === 0) {
