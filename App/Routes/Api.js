@@ -67,6 +67,7 @@ router.delete(
   ItemUnitController.deleteUnit
 ); //Admin Only
 router.get("/unit/:id?", AuthUser.verifyUser, ItemUnitController.getUnit);
+router.get("/unit-by-itemid/:itemId", AuthUser.verifyUser, ItemUnitController.getUnitByItemId);
 
 //Transaction (Pinjam)
 router.post(
