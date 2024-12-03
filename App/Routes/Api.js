@@ -106,6 +106,12 @@ router.get(
   AuthUser.verifyUser,
   AuthUser.adminOnly,
   TransactionController.getPeminjaman
+); //Admin Only
+router.get(
+  "/transaction/checkout-menunggu-konfirmasi",
+  AuthUser.verifyUser,
+  AuthUser.adminOnly,
+  TransactionController.getMenungguKonfirmasi
 );
 
 //Export to Excel

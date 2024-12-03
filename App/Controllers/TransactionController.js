@@ -383,6 +383,41 @@ class TransactionController {
       });
     }
   }
+
+  async getMenungguKonfirmasi(req, res) {
+    try {
+      const menungguKonfirmasi = await TransactionModel.findAll({
+        where: { transactionType: "Menunggu Konfirmasi" },
+        include: [
+          {
+            model: UserModel,
+            as: "user",
+            attributes: {
+              exclude: ["password"],
+            },
+          },
+          { model: ItemModel, as: "item", attributes: { exclude: ["id"] } },
+          {
+            model: ItemUnitModel,
+            as: "unit",
+            attributes: { exclude: ["id", "item_id", "user_id"] },
+          },
+        ],
+
+        order: [["createdAt", "ASC"]],
+      });
+
+      return res.status(200).json({
+        status: "Success",
+        data: menungguKonfirmasi,
+      });
+    } catch (error) {
+      res.status(500).json({
+        status: false,
+        error: error.message,
+      });
+    }
+  }
 }
 
 export default new TransactionController();
