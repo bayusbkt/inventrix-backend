@@ -100,6 +100,12 @@ router.get(
   AuthUser.verifyUser,
   AuthUser.adminOnly,
   TransactionController.getAllTransaction
+); //Admin Only
+router.get(
+  "/transaction/checkout-peminjaman",
+  AuthUser.verifyUser,
+  AuthUser.adminOnly,
+  TransactionController.getPeminjaman
 );
 
 //Export to Excel
